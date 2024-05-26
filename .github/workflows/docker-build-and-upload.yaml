@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
 
+env:
+  VERSION_TAG: 0.0.0
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -73,7 +76,7 @@ jobs:
     - name: Set version tag
       id: set-version-tag
       run: |
-        echo "Version tag is $VERSION_TAG"
+        echo "Version tag is ${VERSION_TAG}"
         echo "${{ env.VERSION_TAG }}" >> $GITHUB_OUTPUT
 
     - uses: softprops/action-gh-release@v1
