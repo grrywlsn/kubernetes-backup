@@ -1,0 +1,45 @@
+name: Build & push
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      packages: write
+      id-token: 'write'
+
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v3
+
+    - name: Set Docker Tag
+      id: set-docker-tag
+      run: |
+        SHORT_SHA=$(git rev-parse --short=8 HEAD)
+        TIMESTAMP=`date +%Y.%-m.%-d-%H%M`
+        DOCKER_TAG="$TIMESTAMP-$BRANCH_TAG$SHORT_SHA"
+        echo "docker-tag=$DOCKER_TAG" >> $GITHUB_OUTPUT
+
+    - name: 'Login to GitHub Container Registry'
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{github.actor}}
+        password: ${{secrets.GITHUB_TOKEN}}
+
+    - name: Build image
+      uses: docker/build-push-action@v4
+      with:
+        load: true
+        tags: ghcr.io/grrywlsn/kubernetes-backup:${{ steps.set-docker-tag.outputs.docker-tag }}
+
+    - name: Push image
+      if: github.ref == 'refs/heads/main'
+      uses: docker/build-push-action@v4
+      with:
+        push: true
+        tags: ghcr.io/grrywlsn/kubernetes-backup:${{ steps.set-docker-tag.outputs.docker-tag }}
