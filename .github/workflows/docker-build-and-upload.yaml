@@ -4,12 +4,16 @@ on:
   push:
     branches: [main]
 
+env:
+  VERSION_TAG: 0.0.0
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: 'read'
-      packages: write
+      contents: 'write'
+      discussions: 'write'
+      packages: 'write'
       id-token: 'write'
 
     steps:
@@ -40,9 +44,8 @@ jobs:
 
     - id: set-version-env-major
       if: contains(github.event.pull_request.labels.*.name, 'major')
-      uses: ubuntu
       run: |
-        echo "VERSION_TAG=${{ steps.semvers.outputs.v_major }}" >> $env:VERSION_TAG
+        echo "VERSION_TAG=${{ steps.semvers.outputs.v_major }}" >> $GITHUB_ENV
 
     # Minor version
     - uses: softprops/action-gh-release@v1
@@ -54,9 +57,8 @@ jobs:
 
     - id: set-version-env-minor
       if: contains(github.event.pull_request.labels.*.name, 'minor')
-      uses: ubuntu
       run: |
-        echo "VERSION_TAG=${{ steps.semvers.outputs.v_minor }}" >> $env:VERSION_TAG
+        echo "VERSION_TAG=${{ steps.semvers.outputs.v_minor }}" >> $GITHUB_ENV
 
     # Patch version
     - uses: softprops/action-gh-release@v1
@@ -68,14 +70,14 @@ jobs:
 
     - id: set-version-env-patch
       if: contains(github.event.pull_request.labels.*.name, 'patch')
-      uses: ubuntu
       run: |
-        echo "VERSION_TAG=${{ steps.semvers.outputs.v_patch }}" >> $env:VERSION_TAG
+        echo "VERSION_TAG=${{ steps.semvers.outputs.v_patch }}" >> $GITHUB_ENV
 
     - name: Set version tag
       id: set-version-tag
       run: |
-        echo "${{ env.VERSION_TAG }}" >> $GITHUB_OUTPUT
+        echo "Version tag is ${VERSION_TAG}"
+        echo "${VERSION_TAG}" >> $GITHUB_OUTPUT
 
     - uses: softprops/action-gh-release@v1
       name: "Tag release"
