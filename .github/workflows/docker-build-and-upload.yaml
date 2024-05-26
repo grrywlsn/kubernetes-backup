@@ -45,7 +45,7 @@ jobs:
     - id: set-version-env-major
       if: contains(github.event.pull_request.labels.*.name, 'major')
       run: |
-        echo "VERSION_TAG=${{ steps.semvers.outputs.v_major }}" >> $env:VERSION_TAG
+        echo "VERSION_TAG=${{ steps.semvers.outputs.v_major }}" >> $GITHUB_ENV
 
     # Minor version
     - uses: softprops/action-gh-release@v1
@@ -58,7 +58,7 @@ jobs:
     - id: set-version-env-minor
       if: contains(github.event.pull_request.labels.*.name, 'minor')
       run: |
-        echo "VERSION_TAG=${{ steps.semvers.outputs.v_minor }}" >> $env:VERSION_TAG
+        echo "VERSION_TAG=${{ steps.semvers.outputs.v_minor }}" >> $GITHUB_ENV
 
     # Patch version
     - uses: softprops/action-gh-release@v1
@@ -71,13 +71,13 @@ jobs:
     - id: set-version-env-patch
       if: contains(github.event.pull_request.labels.*.name, 'patch')
       run: |
-        echo "VERSION_TAG=${{ steps.semvers.outputs.v_patch }}" >> $env:VERSION_TAG
+        echo "VERSION_TAG=${{ steps.semvers.outputs.v_patch }}" >> $GITHUB_ENV
 
     - name: Set version tag
       id: set-version-tag
       run: |
         echo "Version tag is ${VERSION_TAG}"
-        echo "${{ env.VERSION_TAG }}" >> $GITHUB_OUTPUT
+        echo "${VERSION_TAG }" >> $GITHUB_OUTPUT
 
     - uses: softprops/action-gh-release@v1
       name: "Tag release"
