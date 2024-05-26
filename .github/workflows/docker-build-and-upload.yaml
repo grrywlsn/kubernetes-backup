@@ -1,8 +1,8 @@
 name: Build & push
 on:
-  pull_request:
   push:
-    branches: [main]
+    branches:
+      - "main"
 
 env:
   VERSION_TAG: 0.0.0
