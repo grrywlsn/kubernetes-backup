@@ -1,4 +1,4 @@
-FROM alpine:3.19.1
+FROM alpine:3.18
 RUN apk add --update curl coreutils git  && rm -rf /var/cache/apk/*
 COPY entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
