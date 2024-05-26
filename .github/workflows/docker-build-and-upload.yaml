@@ -16,13 +16,73 @@ jobs:
     - name: Git checkout
       uses: actions/checkout@v3
 
-    - name: Set Docker Tag
-      id: set-docker-tag
+    - name: 'Get Previous tag'
+      id: previoustag
+      uses: "WyriHaximus/github-action-get-previous-tag@v1"
+      with:
+        fallback: 0.0.0
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+    - name: 'Get next version'
+      id: semvers
+      uses: "WyriHaximus/github-action-next-semvers@v1"
+      with:
+        version: ${{ steps.previoustag.outputs.tag }}
+
+    # Major version
+    - uses: softprops/action-gh-release@v1
+      if: contains(github.event.pull_request.labels.*.name, 'major')
+      with:
+        generate_release_notes: true
+        token: "${{ secrets.GITHUB_TOKEN }}"
+        tag_name: "${{ steps.semvers.outputs.v_major }}"
+
+    - id: set-version-env-major
+      if: contains(github.event.pull_request.labels.*.name, 'major')
+      uses: ubuntu
       run: |
-        SHORT_SHA=$(git rev-parse --short=8 HEAD)
-        TIMESTAMP=`date +%Y.%-m.%-d-%H%M`
-        DOCKER_TAG="$TIMESTAMP-$BRANCH_TAG$SHORT_SHA"
-        echo "docker-tag=$DOCKER_TAG" >> $GITHUB_OUTPUT
+        echo "VERSION_TAG=${{ steps.semvers.outputs.v_major }}" >> $env:VERSION_TAG
+
+    # Minor version
+    - uses: softprops/action-gh-release@v1
+      if: contains(github.event.pull_request.labels.*.name, 'minor')
+      with:
+        generate_release_notes: true
+        token: "${{ secrets.GITHUB_TOKEN }}"
+        tag_name: "${{ steps.semvers.outputs.v_minor }}"
+
+    - id: set-version-env-minor
+      if: contains(github.event.pull_request.labels.*.name, 'minor')
+      uses: ubuntu
+      run: |
+        echo "VERSION_TAG=${{ steps.semvers.outputs.v_minor }}" >> $env:VERSION_TAG
+
+    # Patch version
+    - uses: softprops/action-gh-release@v1
+      if: contains(github.event.pull_request.labels.*.name, 'patch')
+      with:
+        generate_release_notes: true
+        token: "${{ secrets.GITHUB_TOKEN }}"
+        tag_name: "${{ steps.semvers.outputs.v_patch }}"
+
+    - id: set-version-env-patch
+      if: contains(github.event.pull_request.labels.*.name, 'patch')
+      uses: ubuntu
+      run: |
+        echo "VERSION_TAG=${{ steps.semvers.outputs.v_patch }}" >> $env:VERSION_TAG
+
+    - name: Set version tag
+      id: set-version-tag
+      run: |
+        echo "${{ env.VERSION_TAG }}" >> $GITHUB_OUTPUT
+
+    - uses: softprops/action-gh-release@v1
+      name: "Tag release"
+      with:
+        generate_release_notes: true
+        token: "${{ secrets.GITHUB_TOKEN }}"
+        tag_name: "${{ steps.set-version-tag.outputs.version-tag }}"
 
     - name: 'Login to GitHub Container Registry'
       uses: docker/login-action@v3
@@ -35,11 +95,11 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         load: true
-        tags: ghcr.io/grrywlsn/kubernetes-backup:${{ steps.set-docker-tag.outputs.docker-tag }}
+        tags: ghcr.io/grrywlsn/kubernetes-backup:${{ steps.set-version-tag.outputs.version-tag }}
 
     - name: Push image
       if: github.ref == 'refs/heads/main'
       uses: docker/build-push-action@v4
       with:
         push: true
-        tags: ghcr.io/grrywlsn/kubernetes-backup:${{ steps.set-docker-tag.outputs.docker-tag }}
+        tags: ghcr.io/grrywlsn/kubernetes-backup:${{ steps.set-version-tag.outputs.version-tag }}
