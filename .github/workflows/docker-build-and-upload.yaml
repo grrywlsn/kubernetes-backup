@@ -77,7 +77,7 @@ jobs:
       id: set-version-tag
       run: |
         echo "Version tag is ${VERSION_TAG}"
-        echo "${VERSION_TAG }" >> $GITHUB_OUTPUT
+        echo "${VERSION_TAG}" >> $GITHUB_OUTPUT
 
     - uses: softprops/action-gh-release@v1
       name: "Tag release"
