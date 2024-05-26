@@ -1,4 +1,4 @@
-name: Build & push
+name: Tag, Build and upload post-merge
 on:
   pull_request:
     types: [closed]
