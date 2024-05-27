@@ -43,6 +43,16 @@ jobs:
         load: true
         tags: ghcr.io/grrywlsn/kubernetes-backup:test
 
+  generate_docs:
+    name: Update helm chart docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'write'
+      discussions: 'write'
+      packages: 'write'
+      id-token: 'write'
+
+    steps:
     - name: Generate documentation
       run: |
         pushd .bin
@@ -59,6 +69,6 @@ jobs:
         git add -A
         git commit -m "Regenerate helm docs
         [skip ci]" || echo "No changes to commit"
-        git push origin HEAD:main --force
+        git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
