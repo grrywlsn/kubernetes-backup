@@ -1,6 +1,10 @@
 name: Run pull request checks
 on:
   - pull_request
+
+env:
+  HELM_DOCS_VERSION: "1.13.1"
+
 jobs:
   check_semver_label:
     name: Check for semantic version label
