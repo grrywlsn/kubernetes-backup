@@ -1,6 +1,10 @@
 name: Run pull request checks
 on:
   - pull_request
+
+env:
+  HELM_DOCS_VERSION: "1.13.1"
+
 jobs:
   check_semver_label:
     name: Check for semantic version label
@@ -38,3 +42,39 @@ jobs:
       with:
         load: true
         tags: ghcr.io/grrywlsn/kubernetes-backup:test
+
+  generate_docs:
+    name: Update helm chart docs
+    if: github.event.commits[0].author.name != 'helm-docs'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'write'
+      discussions: 'write'
+      packages: 'write'
+      id-token: 'write'
+
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Generate documentation
+      run: |
+        pushd .bin
+        curl -L https://github.com/norwoodj/helm-docs/releases/download/v${HELM_DOCS_VERSION}/helm-docs_${HELM_DOCS_VERSION}_Linux_x86_64.tar.gz -o helm-docs.tar.gz
+        tar -xvf helm-docs.tar.gz
+        ./helm-docs -c ../charts
+        popd
+
+    - name: Push commit for release
+      run: |
+        git config --global user.email "helm-docs@github.com"
+        git config --global user.name "helm-docs"
+        git checkout -b ${{ github.head_ref || github.ref_name }}  HEAD
+        git add -A
+        git commit -m "Regenerate helm docs
+        [skip ci]" || echo "No changes to commit"
+        git push --set-upstream origin ${{ github.head_ref || github.ref_name }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
