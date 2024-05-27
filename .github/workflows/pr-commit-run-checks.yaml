@@ -12,7 +12,8 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
 
   check_docker_build:
-   runs-on: ubuntu-latest
+    name: Check Docker image can build
+    runs-on: ubuntu-latest
     permissions:
       contents: 'write'
       discussions: 'write'
