@@ -74,6 +74,6 @@ jobs:
         git add -A
         git commit -m "Regenerate helm docs
         [skip ci]" || echo "No changes to commit"
-        git push
+        git push --set-upstream origin ${{ github.head_ref || github.ref_name }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
