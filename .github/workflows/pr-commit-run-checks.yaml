@@ -45,7 +45,7 @@ jobs:
 
   generate_docs:
     name: Update helm chart docs
-    if: github.event.commits[0].author.name != "helm-docs"
+    if: github.event.commits[0].author.name != 'helm-docs'
     runs-on: ubuntu-latest
     permissions:
       contents: 'write'
