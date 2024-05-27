@@ -1,0 +1,52 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kubernetes-backup
+spec:
+  schedule: {{ .Values.cronjob.schedule | quote }}
+  suspend: false
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            service: kubernetes-backup
+        spec:
+          containers:
+          - name: kubernetes-backup
+            image: ghcr.io/grrywlsn/kubernetes-backup:{{ .Values.image.tag }}
+            imagePullPolicy: IfNotPresent
+            env:
+            - name: CLUSTER_NAME
+              value: {{ .Values.cronjob.clusterName | quote  }}
+            - name: BACKUP_REPO
+              value: {{ .Values.cronjob.backupRepo | quote  }}
+            - name: SKIP_RESOURCES
+              value: {{ .Values.cronjob.skipResources | quote  }}
+            - name: SKIP_NAMESPACES
+              value: {{ .Values.cronjob.skipNamespaces | quote  }}
+            envFrom:
+            - secretRef:
+                name: kubernetes-backup
+            resources:
+              limits:
+                cpu: 4
+                memory: 512Mi
+              requests:
+                cpu: 1
+                memory: 512Mi
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+          dnsPolicy: ClusterFirst
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: false
+          serviceAccount: kubernetes-backup
+          serviceAccountName: kubernetes-backup
+          terminationGracePeriodSeconds: 30
