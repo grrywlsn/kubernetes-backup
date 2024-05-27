@@ -5,7 +5,6 @@ on:
 
 env:
   VERSION_TAG: 0.0.0
-  HELM_DOCS_VERSION: "1.13.1"
 
 jobs:
   build-and-push:
@@ -107,27 +106,6 @@ jobs:
       with:
         push: true
         tags: ghcr.io/grrywlsn/kubernetes-backup:${{ steps.set-version-tag.outputs.version-tag }}
-
-    - name: Generate documentation
-      run: |
-        pushd .bin
-        curl -L https://github.com/norwoodj/helm-docs/releases/download/v${HELM_DOCS_VERSION}/helm-docs_${HELM_DOCS_VERSION}_Linux_x86_64.tar.gz -o helm-docs.tar.gz
-        tar -xvf helm-docs.tar.gz
-        ./helm-docs -c ../charts
-        popd
-
-    - name: Push commit for release
-      run: |
-        git config --global user.email "helmdocs@grrywlsn.github.com"
-        git config --global user.name "helm docs"
-        git checkout -b helm-docs HEAD
-        git add -A
-        git commit -m "Regenerate helm docs
-        [skip ci]" || echo "No changes to commit"
-        git push origin HEAD:main --force
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 
     - name: "Publish helm chart"
       uses: appany/helm-oci-chart-releaser@v0.4.1
