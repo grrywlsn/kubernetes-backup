@@ -112,7 +112,7 @@ jobs:
       with:
         name: kubernetes-backup
         tag: "${{ steps.set-version-tag.outputs.version-tag }}"
-        repository: grrywlsn/kubernetes-backup/chart
+        repository: grrywlsn/kubernetes-backup
         registry: ghcr.io
         registry_username: __token__
         registry_password: ${{ secrets.GITHUB_TOKEN }}
