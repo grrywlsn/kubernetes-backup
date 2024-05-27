@@ -1,0 +1,8 @@
+cronjob:
+  schedule: '0 23 * * *'
+  clusterName: ""
+  backupRepo: ""
+  skipNamespaces: "default"
+  skipResources: "leases nodes secrets"
+image:
+  tag: v3.4.2
