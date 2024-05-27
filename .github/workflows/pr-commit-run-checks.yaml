@@ -53,8 +53,8 @@ jobs:
 
     - name: Push commit for release
       run: |
-        git config --global user.email ${{github.event.commits[0].author.email}}
-        git config --global user.name ${{github.event.commits[0].author.name}}
+        git config --global user.email "helm-docs@github.com"
+        git config --global user.name "helm-docs"
         git checkout -b ${{ github.head_ref || github.ref_name }}  HEAD
         git add -A
         git commit -m "Regenerate helm docs
