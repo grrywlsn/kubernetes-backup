@@ -1,4 +1,4 @@
-FROM alpine:3.20
+FROM alpine:3.21
 RUN apk add --update curl coreutils git bash && rm -rf /var/cache/apk/*
 ADD https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 /usr/local/bin/yq
 RUN chmod +x /usr/local/bin/yq
