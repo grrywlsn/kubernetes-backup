@@ -95,14 +95,14 @@ jobs:
         password: ${{secrets.GITHUB_TOKEN}}
 
     - name: Build docker image
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v6
       with:
         load: true
         tags: ghcr.io/grrywlsn/kubernetes-backup:${{ steps.set-version-tag.outputs.version-tag }}
 
     - name: Push docker image
       if: github.ref == 'refs/heads/main'
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v6
       with:
         push: true
         tags: ghcr.io/grrywlsn/kubernetes-backup:${{ steps.set-version-tag.outputs.version-tag }}
