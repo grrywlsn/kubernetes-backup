@@ -23,7 +23,7 @@ jobs:
 
     - name: 'Get Previous tag'
       id: previoustag
-      uses: "WyriHaximus/github-action-get-previous-tag@v1"
+      uses: "WyriHaximus/github-action-get-previous-tag@v2"
       with:
         fallback: "${{ env.VERSION_TAG }}"
       env:
@@ -116,3 +116,4 @@ jobs:
         registry: ghcr.io
         registry_username: __token__
         registry_password: ${{ secrets.GITHUB_TOKEN }}
+        
