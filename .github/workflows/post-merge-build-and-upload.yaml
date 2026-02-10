@@ -116,4 +116,3 @@ jobs:
         registry: ghcr.io
         registry_username: __token__
         registry_password: ${{ secrets.GITHUB_TOKEN }}
-        
